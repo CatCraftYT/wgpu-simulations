@@ -28,7 +28,7 @@ sim_values = np.zeros((), dtype=[
 ])
 
 for n, arg in enumerate(arg_names):
-    sim_values[arg] = int(args[n])
+    sim_values[arg] = args[n]
 
 # Create canvas (window)
 app = QtWidgets.QApplication([])
@@ -51,8 +51,8 @@ with open("compute_shader.wgsl", "r") as shader_file:
     compute_shader = device.create_shader_module(code=shader_file.read())
 
 # Create buffer containing our sim parameters
-sim_values_buffer = device.create_buffer(
-    size=sim_values.nbytes, usage=wgpu.BufferUsage.UNIFORM | wgpu.BufferUsage.COPY_DST
+sim_values_buffer = device.create_buffer_with_data(
+    data=sim_values, usage=wgpu.BufferUsage.UNIFORM | wgpu.BufferUsage.COPY_DST
 )
 
 # Create position data
@@ -158,11 +158,11 @@ def draw_frame():
     command_encoder = device.create_command_encoder()
 
     # Setup compute pipeline
-    #compute_pass = command_encoder.begin_compute_pass()
-    #compute_pass.set_pipeline(compute_pipeline)
-    #compute_pass.set_bind_group(0, bind_group)
-    #compute_pass.dispatch_workgroups(sim_values["n_particles"], 1, 1)
-    #compute_pass.end()
+    compute_pass = command_encoder.begin_compute_pass()
+    compute_pass.set_pipeline(compute_pipeline)
+    compute_pass.set_bind_group(0, bind_group)
+    compute_pass.dispatch_workgroups(sim_values["n_particles"], 1, 1)
+    compute_pass.end()
 
     # Setup render pipeline
     render_pass = command_encoder.begin_render_pass(
@@ -178,6 +178,7 @@ def draw_frame():
     )
 
     render_pass.set_pipeline(render_pipeline)
+    render_pass.set_bind_group(0, bind_group)
     render_pass.draw(3, 1, 0, 0)
 
     render_pass.end()

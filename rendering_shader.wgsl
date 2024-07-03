@@ -13,10 +13,6 @@ var<uniform> params: paramsStruct;
 @binding(1)
 var<storage, read_write> position_buffer: array<vec2<f32>>;
 
-@group(0)
-@binding(2)
-var<storage, read_write> velocity_buffer: array<vec2<f32>>;
-
 const col1: vec3<f32> = vec3(0, 0, 0);
 const col2: vec3<f32> = vec3(0.08, 0.08, 0.2);
 const col3: vec3<f32> = vec3(1, 0.4, 0.4);
@@ -57,5 +53,5 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32,) -> VertexOutput {
 
 @fragment
 fn fs_main(@location(0) coord: vec2<f32>) -> @location(0) vec4<f32> {
-    return get_color(coord.x + 1);
+    return get_color(coord.x + 1 + params.gravity_constant);
 }
