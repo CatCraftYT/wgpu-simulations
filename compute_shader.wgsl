@@ -17,8 +17,8 @@ var<storage, read_write> position_buffer: array<vec2<f32>>;
 @binding(2)
 var<storage, read_write> velocity_buffer: array<vec2<f32>>;
 
-@compute @workgroup_size(2)
-fn main_compute(@builtin(global_invocation_id) global_id: vec3<u32>) {
+@compute @workgroup_size(1)
+fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     if (global_id.x > params.n_particles) { return; }
     let position: vec2<f32> = position_buffer[global_id.x];
     
