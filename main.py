@@ -7,6 +7,7 @@ from wgpu.gui.qt import WgpuCanvas, run
 # Get required arguments for sim
 ###----------###
 arg_names = [
+    "zoom",
     "gravity_constant",
     "max_impulse",
     "expansion_factor",
@@ -21,6 +22,7 @@ if len(args) != len(arg_names):
 
 # Create parameters
 sim_values = np.zeros((), dtype=[
+    ("zoom", "float32"),
     ("gravity_constant", "float32"),
     ("max_impulse", "float32"),
     ("expansion_factor", "float32"),

@@ -1,4 +1,5 @@
 struct paramsStruct {
+    zoom: f32, // not needed for this shader but included because it's easier
     gravity_constant: f32,
     max_impulse: f32,
     expansion_factor: f32,

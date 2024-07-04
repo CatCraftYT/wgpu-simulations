@@ -1,4 +1,5 @@
 struct paramsStruct {
+    zoom: f32,
     gravity_constant: f32,
     max_impulse: f32,
     expansion_factor: f32,
@@ -53,5 +54,13 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32,) -> VertexOutput {
 
 @fragment
 fn fs_main(@location(0) coord: vec2<f32>) -> @location(0) vec4<f32> {
-    return get_color(coord.x + 1 + params.gravity_constant);
+    let adjustedCoord: vec2<f32> = coord * params.zoom;
+
+    var count: f32 = 0;
+    for (var i: u32 = 0; i < params.n_particles; i++) {
+        if (distance(position_buffer[i], adjustedCoord) < 1.0) {
+            count = count + 1.0;
+        }
+    }
+    return get_color(count / 2.0);
 }
