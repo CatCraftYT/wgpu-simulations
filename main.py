@@ -8,6 +8,7 @@ from wgpu.gui.qt import WgpuCanvas, run
 ###----------###
 arg_names = [
     "zoom",
+    "density",
     "gravity_constant",
     "max_impulse",
     "expansion_factor",
@@ -30,7 +31,8 @@ sim_values = np.zeros((), dtype=[
 ])
 
 for n, arg in enumerate(arg_names):
-    sim_values[arg] = args[n]
+    if arg in sim_values.dtype.names: # type: ignore
+        sim_values[arg] = args[n]
 
 # Create canvas (window)
 app = QtWidgets.QApplication([])
@@ -57,15 +59,18 @@ sim_values_buffer = device.create_buffer_with_data(
     data=sim_values, usage=wgpu.BufferUsage.UNIFORM | wgpu.BufferUsage.COPY_DST
 )
 
+rng = np.random.default_rng()
 # Create position data
 position_data = np.zeros(sim_values["n_particles"], dtype=[
     ("position", "float32", (2))
 ])
-
 # Create velocity data
 velocity_data = np.zeros(sim_values["n_particles"], dtype=[
     ("velocity", "float32", (2))
 ])
+# Init position data
+for i in range(0, sim_values["n_particles"]):
+    position_data[i][0] = (rng.random((2), dtype=np.float32) * 2 - 1) * int(args[1])
 
 # Create GPU buffer for position data
 # size is sizeof(float) * (2 for vec2) * n_particles
