@@ -70,7 +70,7 @@ velocity_data = np.zeros(sim_values["n_particles"], dtype=[
 ])
 # Init position data
 for i in range(0, sim_values["n_particles"]):
-    position_data[i][0] = (rng.random((2), dtype=np.float32) * 2 - 1) * int(args[1])
+    position_data[i][0] = (rng.random((2), dtype=np.float32) * 2 - 1) * float(args[1])
 
 # Create GPU buffer for position data
 # size is sizeof(float) * (2 for vec2) * n_particles
@@ -191,6 +191,10 @@ def draw_frame():
     render_pass.end()
     device.queue.submit([command_encoder.finish()])
 
+def render_loop():
+    draw_frame()
+    canvas.request_draw(render_loop)
+
 # Start rendering/processing loop
-canvas.request_draw(draw_frame)
+canvas.request_draw(render_loop)
 run()

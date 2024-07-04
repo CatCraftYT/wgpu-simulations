@@ -38,4 +38,9 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         velocity_buffer[global_id.x] += impulse * directionUnitVec;
     }
     velocity_buffer[global_id.x] += position * params.expansion_factor;
+
+    // Sync all invocations to this point so we don't get race conditions trying to add velocities
+    storageBarrier();
+
+    position_buffer[global_id.x] += velocity_buffer[global_id.x];
 }
