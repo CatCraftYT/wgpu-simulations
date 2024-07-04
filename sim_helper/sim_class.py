@@ -111,14 +111,14 @@ class Simulation():
             render_texture = self.render_context.get_current_texture()
             command_encoder = self.device.create_command_encoder()
 
-            compute_pass = command_encoder.begin_compute_pass()
             for inaccurate, n_workgroups, compute_pipeline in self.compute_pipelines:
                 if inaccurate and self.frame_number % self.inaccuracy != 0:
                     continue
+                compute_pass = command_encoder.begin_compute_pass()
                 compute_pass.set_pipeline(compute_pipeline)
                 compute_pass.set_bind_group(0, self.bind_group)
                 compute_pass.dispatch_workgroups(n_workgroups, 1, 1)
-            compute_pass.end()
+                compute_pass.end()
 
             # Setup render pipeline
             render_pass = command_encoder.begin_render_pass(

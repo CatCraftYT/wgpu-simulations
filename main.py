@@ -1,7 +1,6 @@
 import wgpu
 import numpy as np
 import sim_helper
-from wgpu.gui.auto import WgpuCanvas, run
 
 # Get required arguments for sim
 args = sim_helper.get_args([
@@ -14,6 +13,7 @@ args = sim_helper.get_args([
     "n_particles"
 ])
 
+print(args)
 # Remove density and rotation since they aren't passed to shaders
 density = float(args.pop("density"))
 rotation_speed = float(args.pop("rotation_speed"))
@@ -47,6 +47,8 @@ def position_data_function(data):
 
 # Function to init velocity data
 def velocity_data_function(data):
+    if rotation_speed == 0: return
+
     for i in range(0, sim_values["n_particles"]):
         data[i][0] = np.delete(np.cross(np.append(position_data[i][0], 0), [0, 0, -1]), 2)
         data[i][0] = data[i][0] / np.linalg.norm(data[i][0]) * rotation_speed
@@ -80,7 +82,7 @@ simulation.create_buffer(
     usage = wgpu.BufferUsage.STORAGE,
     buffer_type = wgpu.BufferBindingType.storage,
     visibility = wgpu.ShaderStage.COMPUTE,
-    data = position_data
+    data = velocity_data
 )
 
 simulation.finalize_buffers()
