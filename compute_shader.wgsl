@@ -32,15 +32,18 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         let directionVec: vec2<f32> = otherPosition - position;
         let distSqr: f32 = dot(directionVec, directionVec);
         let directionUnitVec: vec2<f32> = normalize(directionVec);
+        if (distSqr == 0) {
+            continue;
+        }
 
         let impulse: f32 = min(params.max_impulse, params.gravity_constant / distSqr);
 
         velocity_buffer[global_id.x] += impulse * directionUnitVec;
     }
     velocity_buffer[global_id.x] += position * params.expansion_factor;
+}
 
-    // Sync all invocations to this point so we don't get race conditions trying to add velocities
-    storageBarrier();
-
+@compute @workgroup_size(1)
+fn update_positions(@builtin(global_invocation_id) global_id: vec3<u32>) {
     position_buffer[global_id.x] += velocity_buffer[global_id.x];
 }

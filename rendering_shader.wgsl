@@ -58,9 +58,9 @@ fn fs_main(@location(0) coord: vec2<f32>) -> @location(0) vec4<f32> {
 
     var count: f32 = 0;
     for (var i: u32 = 0; i < params.n_particles; i++) {
-        if (distance(position_buffer[i], adjustedCoord) < 0.5) {
+        if (distance(position_buffer[i], adjustedCoord) < params.zoom / 500) {
             count = count + 1.0;
         }
     }
-    return get_color(count / 5.0);
+    return get_color(count / 3.0);
 }

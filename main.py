@@ -1,8 +1,7 @@
 import sys
 import wgpu
 import numpy as np
-from PyQt6 import QtWidgets
-from wgpu.gui.qt import WgpuCanvas, run
+from wgpu.gui.auto import WgpuCanvas, run
 
 # Get required arguments for sim
 ###----------###
@@ -35,7 +34,6 @@ for n, arg in enumerate(arg_names):
         sim_values[arg] = args[n]
 
 # Create canvas (window)
-app = QtWidgets.QApplication([])
 canvas = WgpuCanvas(title="Gravity simulation")
 
 # Get GPU device
@@ -71,6 +69,11 @@ velocity_data = np.zeros(sim_values["n_particles"], dtype=[
 # Init position data
 for i in range(0, sim_values["n_particles"]):
     position_data[i][0] = (rng.random((2), dtype=np.float32) * 2 - 1) * float(args[1])
+
+# Init velocity data
+for i in range(0, sim_values["n_particles"]):
+    velocity_data[i][0] = np.delete(np.cross(np.append(position_data[i][0], 0), [0, 0, -1]), 2)
+    velocity_data[i][0] = velocity_data[i][0] / np.linalg.norm(velocity_data[i][0]) * 0.75
 
 # Create GPU buffer for position data
 # size is sizeof(float) * (2 for vec2) * n_particles
@@ -138,6 +141,15 @@ compute_pipeline = device.create_compute_pipeline(
     },
 )
 
+# Create compute pipeline for updating positions
+compute_pipeline_positions = device.create_compute_pipeline(
+    layout=pipeline_layout,
+    compute={
+        "module": compute_shader,
+        "entry_point": "update_positions"
+    },
+)
+
 # Create render pipeline
 render_pipeline = device.create_render_pipeline(
     layout=pipeline_layout,
@@ -159,17 +171,28 @@ render_pipeline = device.create_render_pipeline(
     },
 )
 
+frame_number = 0
+
 # Run every frame
 def draw_frame():
+    global frame_number
     render_texture = context.get_current_texture()
     command_encoder = device.create_command_encoder()
 
-    # Setup compute pipeline
-    compute_pass = command_encoder.begin_compute_pass()
-    compute_pass.set_pipeline(compute_pipeline)
-    compute_pass.set_bind_group(0, bind_group)
-    compute_pass.dispatch_workgroups(sim_values["n_particles"], 1, 1)
-    compute_pass.end()
+    # Setup compute pipeline for velocity
+    if frame_number % 5 == 0:
+        compute_pass = command_encoder.begin_compute_pass()
+        compute_pass.set_pipeline(compute_pipeline)
+        compute_pass.set_bind_group(0, bind_group)
+        compute_pass.dispatch_workgroups(sim_values["n_particles"], 1, 1)
+        compute_pass.end()
+
+    # Setup compute pipeline for position updating
+    compute_pass_positions = command_encoder.begin_compute_pass()
+    compute_pass_positions.set_pipeline(compute_pipeline_positions)
+    compute_pass_positions.set_bind_group(0, bind_group)
+    compute_pass_positions.dispatch_workgroups(sim_values["n_particles"], 1, 1)
+    compute_pass_positions.end()
 
     # Setup render pipeline
     render_pass = command_encoder.begin_render_pass(
@@ -190,6 +213,7 @@ def draw_frame():
 
     render_pass.end()
     device.queue.submit([command_encoder.finish()])
+    frame_number += 1
 
 def render_loop():
     draw_frame()
