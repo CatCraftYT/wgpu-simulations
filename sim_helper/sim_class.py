@@ -114,6 +114,7 @@ class Simulation():
             for inaccurate, n_workgroups, compute_pipeline in self.compute_pipelines:
                 if inaccurate and self.frame_number % self.inaccuracy != 0:
                     continue
+                    
                 compute_pass = command_encoder.begin_compute_pass()
                 compute_pass.set_pipeline(compute_pipeline)
                 compute_pass.set_bind_group(0, self.bind_group)

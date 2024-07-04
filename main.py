@@ -13,12 +13,9 @@ args = sim_helper.get_args([
     "n_particles"
 ])
 
-print(args)
 # Remove density and rotation since they aren't passed to shaders
 density = float(args.pop("density"))
 rotation_speed = float(args.pop("rotation_speed"))
-
-print(args)
 
 # Create parameters
 sim_values = sim_helper.create_parameters(args, [
@@ -91,12 +88,12 @@ simulation.finalize_buffers()
 simulation.create_compute_pipeline(
     entry_point = "main",
     n_workgroups = int(sim_values["n_particles"]),
-    inaccurate = False
+    inaccurate = True
 )
 simulation.create_compute_pipeline(
     entry_point = "update_positions",
     n_workgroups = int(sim_values["n_particles"]),
-    inaccurate = True
+    inaccurate = False
 )
 
 # Create render pipeline
