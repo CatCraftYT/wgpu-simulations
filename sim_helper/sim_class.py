@@ -21,6 +21,7 @@ class Simulation():
 
     def __init__(self, name="Super Awesome Simulation", inaccuracy = 1):
         self.inaccuracy = inaccuracy
+        self.compute_pipelines = []
         self.binding_layouts = []
         self.bindings = []
 

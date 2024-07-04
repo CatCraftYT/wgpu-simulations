@@ -7,7 +7,7 @@ def get_args(arg_names: list[str]):
     if len(args) != len(arg_names):
         print(f"Incorrect number of arguments provided. Required arguments are: {', '.join(arg_names)}")
         sys.exit(1)
-        
+
     return {arg_names[i]: args[i] for i in range(len(args))}
 
 def create_parameters(params: dict[str, Any], paramTypes: list[str]):
