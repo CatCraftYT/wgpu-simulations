@@ -1,9 +1,13 @@
 struct paramsStruct {
+    draw_blobs: u32,
     optimum_distance: f32,
     dampening: f32,
     falloff: f32,
     attraction_force: f32,
     repulsion_force: f32,
+    heat_loss: f32,
+    heat_gain: f32,
+    heat_zone: f32,
     n_particles: u32
 }
 
@@ -37,18 +41,32 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32,) -> VertexOutput {
     return out;
 }
 
-const color: vec4<f32> = vec4(1, 0.5, 0, 1);
+const color: vec4<f32> = vec4(1, 0.25, 0, 1);
 
-@fragment
-fn fs_main(@location(0) coord: vec2<f32>) -> @location(0) vec4<f32> {
+fn blob_rendering(coord: vec2<f32>) -> vec4<f32> {
     var count: u32 = 0;
     for (var i: u32 = 0; i < params.n_particles; i++) {
-        if (distance(position_buffer[i], coord) < 0.005) {
-            if (count >= 0) {
+        if (distance(position_buffer[i], coord) < 0.05) {
+            if (count >= 20) {
                 return color;
             }
             count++;
         }
     }
+    return vec4<f32>(0,0,0,1);
+}
+
+@fragment
+fn fs_main(@location(0) coord: vec2<f32>) -> @location(0) vec4<f32> {
+    if (params.draw_blobs > 0) {
+        return blob_rendering(coord);
+    }
+
+    for (var i: u32 = 0; i < params.n_particles; i++) {
+        if (distance(position_buffer[i], coord) < 0.005) {
+            return color;
+        }
+    }
+
     return vec4<f32>(0,0,0,1);
 }

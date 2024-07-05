@@ -9,16 +9,24 @@ import sim_helper
 
 # Get required arguments for sim
 args = sim_helper.get_args([
+    "draw_blobs",
     "optimal_distance",
     "dampening",
     "falloff",
     "attraction_force",
     "repulsion_force",
+    "heat_loss",
+    "heat_gain",
+    "heat_zone",
     "n_particles",
 ])
 
 # Create parameters
 sim_values = sim_helper.create_parameters(args, [
+    "uint32", # can't be a bool because it's not shareable with the shader
+    "float32",
+    "float32",
+    "float32",
     "float32",
     "float32",
     "float32",
@@ -26,8 +34,6 @@ sim_values = sim_helper.create_parameters(args, [
     "float32",
     "uint32",
 ])
-
-print(args)
 
 simulation = sim_helper.Simulation("Lava Lamp Simulation", inaccuracy = 1, file_path = dirname(__file__))
 
@@ -61,6 +67,14 @@ velocity_data = sim_helper.create_data_array(
         ("velocity", "float32", (2))
     ]
 )
+# Create heat data
+heat_data = sim_helper.create_data_array(
+    n_elements = sim_values["n_particles"],
+    data_function=None,
+    dtype=[
+        ("heat", "float32")
+    ]
+)
 
 # Create GPU buffer for position data
 simulation.create_buffer(
@@ -75,6 +89,13 @@ simulation.create_buffer(
     buffer_type = wgpu.BufferBindingType.storage,
     visibility = wgpu.ShaderStage.COMPUTE,
     data = velocity_data
+)
+# Create GPU buffer for heat data
+simulation.create_buffer(
+    usage = wgpu.BufferUsage.STORAGE,
+    buffer_type = wgpu.BufferBindingType.storage,
+    visibility = wgpu.ShaderStage.COMPUTE,
+    data = heat_data
 )
 
 simulation.finalize_buffers()

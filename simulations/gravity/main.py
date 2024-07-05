@@ -9,6 +9,7 @@ import sim_helper
 
 # Get required arguments for sim
 args = sim_helper.get_args([
+    "inaccuracy",
     "density",
     "rotation_speed",
     "zoom",
@@ -18,9 +19,10 @@ args = sim_helper.get_args([
     "n_particles"
 ])
 
-# Remove density and rotation since they aren't passed to shaders
+# Remove some parameters since they aren't passed to shaders
 density = float(args.pop("density"))
 rotation_speed = float(args.pop("rotation_speed"))
+inaccuracy = int(args.pop("inaccuracy"))
 
 # Create parameters
 sim_values = sim_helper.create_parameters(args, [
@@ -31,7 +33,7 @@ sim_values = sim_helper.create_parameters(args, [
     "uint32"
 ])
 
-simulation = sim_helper.Simulation("Gravity Simulation", inaccuracy = 5, file_path = dirname(__file__))
+simulation = sim_helper.Simulation("Gravity Simulation", inaccuracy = inaccuracy, file_path = dirname(__file__))
 
 # Create buffer containing our sim parameters
 simulation.create_buffer(
