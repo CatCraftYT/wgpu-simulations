@@ -1,5 +1,6 @@
 from typing import Any
 import wgpu
+from os.path import join as path_join
 from wgpu.gui.auto import WgpuCanvas, run
 import numpy as np
 
@@ -19,7 +20,7 @@ class Simulation():
     render_shader: wgpu.GPUShaderModule
     compute_shader: wgpu.GPUShaderModule
 
-    def __init__(self, name="Super Awesome Simulation", inaccuracy = 1):
+    def __init__(self, name="Super Awesome Simulation", inaccuracy = 1, file_path = "./"):
         self.inaccuracy = inaccuracy
         self.compute_pipelines = []
         self.binding_layouts = []
@@ -38,10 +39,10 @@ class Simulation():
         self.render_context.configure(device=self.device, format=render_texture_format)
 
         # Load shaders from files
-        with open("rendering_shader.wgsl", "r") as shader_file:
+        with open(path_join(file_path, "rendering_shader.wgsl"), "r") as shader_file:
             self.render_shader = self.device.create_shader_module(code=shader_file.read())
 
-        with open("compute_shader.wgsl", "r") as shader_file:
+        with open(path_join(file_path, "compute_shader.wgsl"), "r") as shader_file:
             self.compute_shader = self.device.create_shader_module(code=shader_file.read())
     
     def create_buffer(self, usage, buffer_type, visibility, data):

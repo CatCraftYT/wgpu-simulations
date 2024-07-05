@@ -1,5 +1,10 @@
+from sys import path as module_path
+from os import getcwd
+from os.path import dirname
 import wgpu
 import numpy as np
+
+module_path.append(getcwd())
 import sim_helper
 
 # Get required arguments for sim
@@ -26,7 +31,7 @@ sim_values = sim_helper.create_parameters(args, [
     "uint32"
 ])
 
-simulation = sim_helper.Simulation("Gravity Simulation", inaccuracy = 5)
+simulation = sim_helper.Simulation("Gravity Simulation", inaccuracy = 5, file_path = dirname(__file__))
 
 # Create buffer containing our sim parameters
 simulation.create_buffer(
