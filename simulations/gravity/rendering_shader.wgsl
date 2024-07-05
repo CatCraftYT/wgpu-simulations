@@ -15,8 +15,8 @@ var<uniform> params: paramsStruct;
 var<storage, read_write> position_buffer: array<vec2<f32>>;
 
 const col1: vec3<f32> = vec3(0, 0, 0);
-const col2: vec3<f32> = vec3(0.08, 0.08, 0.2);
-const col3: vec3<f32> = vec3(1, 0.4, 0.4);
+const col2: vec3<f32> = vec3(0.056, 0.056, 0.224);
+const col3: vec3<f32> = vec3(1, 0.239, 0.239);
 const col4: vec3<f32> = vec3(1, 1, 1);
 
 // https://stackoverflow.com/q/47285778
@@ -58,9 +58,9 @@ fn fs_main(@location(0) coord: vec2<f32>) -> @location(0) vec4<f32> {
 
     var count: f32 = 0;
     for (var i: u32 = 0; i < params.n_particles; i++) {
-        if (distance(position_buffer[i], adjustedCoord) < params.zoom / 500) {
+        if (distance(position_buffer[i], adjustedCoord) < params.zoom / 400) {
             count = count + 1.0;
         }
     }
-    return get_color(count / 3.0);
+    return get_color(count / 6.0);
 }

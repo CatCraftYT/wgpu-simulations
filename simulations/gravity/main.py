@@ -55,7 +55,7 @@ def velocity_data_function(data):
 
     for i in range(0, sim_values["n_particles"]):
         data[i][0] = np.delete(np.cross(np.append(position_data[i][0], 0), [0, 0, -1]), 2)
-        data[i][0] = data[i][0] / np.linalg.norm(data[i][0]) * rotation_speed
+        data[i][0] = (data[i][0] / np.linalg.norm(data[i][0])) * rotation_speed
 
 # Create position data
 position_data = sim_helper.create_data_array(
